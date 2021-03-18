@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+<head>
+	{% load static %}
+</head>
+
+{% block content %}
+<div class="mt-6 w-5/6 m-auto">
+	<h1 class="text-white font-bold text-center text-3xl mb-6">Pending Events</h2>
+	{% if event_list %}
+	<table class="min-w-full table-auto">
+		<thead>
+			<tr class="bg-gray-800">
+				<th class="px-16 py-2">
+					<span class="text-gray-300">Name</span>
+				</th>
+				<th class="px-16 py-2">
+					<span class="text-gray-300">Type</span>
+				</th>
+				<th class="px-16 py-2">
+					<span class="text-gray-300">Start Date</span>
+				</th>
+				<th class="px-16 py-2">
+					<span class="text-gray-300">End Date</span>
+				</th>
+				<th class="px-16 py-2">
+					<span class="text-gray-300">Action</span>
+				</th>
+			</tr>
+		</thead>
+		<tbody class="bg-gray-600">
+			{% for event in event_list %}
+				<tr id="{{event.id}}" name="event-row" class="{% if forloop.counter0|divisibleby:2 %}bg-gray-600{% else %}bg-gray-700{% endif %} text-white">
+					<td class="px-16 py-2 text-center">
+						<span id='name'>{{ event.owner.get_name }}</span>
+					</td>
+					<td class="px-16 py-2 text-center">
+						<span id='typeOf'>{{ event.typeOf }}</span>
+					</td>
+					<td class="px-16 py-2 text-center">
+						<span id='startDate'>{{ event.start }}</span>
+					</td>
+					<td class="px-16 py-2 text-center">
+						<span id='endDate'>{{ event.end }}</span>
+					</td>
+					<td class="py-2 text-center">
+						<span>
+							<button type="button" id="approveApproval" onClick="approveEvent({{event.id}})" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-2 py-1 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+								Approve
+							</button>
+							<button type="button" id="denyApproval" onClick="denyEvent({{event.id}})" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-2 py-1 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+								Deny
+							</button>
+						</span>
+					</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	{% else %}
+	<h3 class="text-gray-400 font-bold text-center text-xl mb-6">No pending events</h2>
+	{%endif%}
+	<h3 class="text-gray-400 font-bold text-center text-xl mb-6"></h2>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'sweetalert2-lib/package/dist/sweetalert2.min.js' %}"></script>
+<script>
+function approveEvent(id) {
+	$.ajax({
+		type: 'GET',
+		url: "{% url 'calendarapp:approve-event' %}",
+		data: {"id":id},
+		dataType: 'json',
+		success: function(response) {
+			$('tbody>tr#'+id).remove();
+			$('#approveEventModal').addClass('hidden');
+			success_msg(response['msg'])
+			check_events();
+			renderTableColors();
+		},
+		error: function(response) {
+			$('#approveEventModal').addClass('hidden');
+			error_msg(response.responseJSON.msg);
+		}
+	});
+}
+
+function denyEvent(id) {
+	$.ajax({
+		type: 'GET',
+		url: "{% url 'calendarapp:deny-event' %}",
+		data: {"id":id},
+		dataType: 'json',
+		success: function(response) {
+			$('tbody>tr#'+id).remove();
+			$('#approveEventModal').addClass('hidden');
+			success_msg(response['msg'])
+			check_events()
+			renderTableColors();
+		},
+		error: function(response) {
+			$('#approveEventModal').addClass('hidden');
+			error_msg(response.responseJSON.msg);
+		}
+	});
+}
+
+function check_events() {
+	var num = document.getElementsByName('event-row').length;
+	if (num == 0) {
+		$('table').remove();
+		$('h3').text('No pending events')
+	}
+}
+
+function success_msg(title) {
+	Swal.fire({
+		position: 'center',
+		icon: 'success',
+		title: title,
+		showConfirmButton: false,
+		timer: 1500
+	});
+}
+
+function error_msg(title) {
+	Swal.fire({
+		position: 'center',
+		icon: 'error',
+		title: title,
+		showConfirmButton: false,
+		timer: 1500
+	});
+}
+
+function renderTableColors() {
+	$("table > tbody tr").removeClass("bg-gray-600").removeClass("bg-gray-700");
+	$("table > tbody tr:even").addClass("bg-gray-600");
+	$("table > tbody tr:odd").addClass("bg-gray-700");
+}
+
+</script>
+{% endblock %}

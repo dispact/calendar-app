@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+	a {
+		@apply text-white;
+	}
+	.fc-toolbar-title {
+		@apply text-white font-bold;
+	}
+	.fc-scrollgrid-shrink-cushion {
+		@apply text-white;
+	}
+}

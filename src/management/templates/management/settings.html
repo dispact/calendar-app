@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+<head>
+	{% load static %}
+</head>
+
+{% block content %}
+<div class="mt-6 w-5/6 m-auto">
+	<h1 class="text-white font-bold text-center text-3xl mb-6">Settings</h1>
+	<form id="saveSettingsForm" class="m-auto w-1/2">
+		<label for="first_name" class="text-sm text-gray-300">First Name</label>
+		<input name="first_name" id="first_name" required class="appearance-none bg-gray-700 relative block w-full px-3 py-2 border border-gray-500 placeholder-gray-300 text-gray-200 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm mb-4" value="{{first_name}}"/>
+
+		<label for="last_name" class="text-sm text-gray-300">Last Name</label>
+		<input name="last_name" id="last_name" required class="appearance-none bg-gray-700 relative block w-full px-3 py-2 border border-gray-500 placeholder-gray-300 text-gray-200 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm mb-4" value="{{last_name}}" />
+
+		<button id="saveSettingsBtn" class="group relative w-full flex justify-center py-2 px-4 mt-6 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+			Save
+		</button>
+	</form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+$("#saveSettingsForm").submit(function(event) {
+	event.preventDefault();
+});
+$("#saveSettingsBtn").click(function() {
+	var f_name = $("#first_name").val()
+	var l_name = $("#last_name").val()
+	$.ajax({
+		type: 'GET',
+		url: '{% url "management:save-settings" %}',
+		data: {'first_name': f_name, 'last_name': l_name},
+		dataType: 'json',
+		success: function(response) {
+			success_msg(response['msg']);
+			$("#userName").text(f_name + ' ' + l_name);
+		},
+		error: function(response) {
+			error_msg(response.responseJSON.msg);
+		}
+	});
+});
+
+</script>
+{% endblock %}

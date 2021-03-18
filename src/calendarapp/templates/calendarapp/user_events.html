@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+<head>
+	{% load static %}
+</head>
+
+{% block content %}
+<div class="mt-6 w-5/6 m-auto">
+	<h1 class="text-white font-bold text-center text-3xl mb-6">Your Events</h2>
+	{% if event_list %}
+	<table class="min-w-full table-auto">
+		<thead>
+			<tr class="bg-gray-800">
+				<th class="px-16 py-2">
+					<span class="text-gray-300">Status</span>
+				</th>
+				<th class="px-16 py-2">
+					<span class="text-gray-300">Type</span>
+				</th>
+				<th class="px-16 py-2">
+					<span class="text-gray-300">Start Date</span>
+				</th>
+				<th class="px-16 py-2">
+					<span class="text-gray-300">End Date</span>
+				</th>
+			</tr>
+		</thead>
+		<tbody class="bg-gray-600">
+			{% for event in event_list %}
+				<tr id="{{event.id}}" name="event-row" class="{% if forloop.counter0|divisibleby:2 %}bg-gray-600{% else %}bg-gray-700{% endif %} text-white">
+					<td class="py-2 text-center">
+						<span class="rounded-full text-white bg-{{event.status.color}}-500 px-2 py-1 text-xs font-medium mr-3">{{event.status}}</span>
+					</td>
+					<td class="px-16 py-2 text-center">
+						<span id='typeOf'>{{ event.typeOf }}</span>
+					</td>
+					<td class="px-16 py-2 text-center">
+						<span id='startDate'>{{ event.start }}</span>
+					</td>
+					<td class="px-16 py-2 text-center">
+						<span id='endDate'>{{ event.end }}</span>
+					</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	{% else %}
+	<h2 class="text-gray-400 font-bold text-center text-xl mb-6">You have no events</h2>
+	{%endif%}
+</div>
+{% endblock %}
